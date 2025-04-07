@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Website List Keren</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredericka+the+Great&family=Orbitron&family=Rubik+Mono+One&family=Baloo+2&family=Permanent+Marker&family=Bangers&family=Rock+Salt&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+    body {
+        font-family: 'Baloo 2', cursive;
+        background: linear-gradient(to right, #2c3e50, #3498db);
+        margin: 0;
+        padding: 20px;
+        overflow-x: hidden;
+    }
+    h1 {
+        font-family: 'Permanent Marker', cursive;
+        color: #fff;
+        font-size: 3em;
+        text-align: center;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px #000;
+    }
+    .papan {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 20px;
+        border-radius: 15px;
+        margin: 10px auto;
+        width: 90%;
+        max-width: 600px;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        backdrop-filter: blur(10px);
+    }
+    .papan input, .papan select {
+        margin: 5px;
+        padding: 10px;
+        width: 45%;
+        font-size: 1em;
+        border-radius: 10px;
+        border: none;
+        outline: none;
+    }
+    .btns {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .btns button {
+        background: #27ae60;
+        color: white;
+        padding: 12px 20px;
+        margin: 5px;
+        border: none;
+        border-radius: 20px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    .btns button:hover {
+        background: #2ecc71;
+    }
+    #output {
+        background: rgba(255, 255, 255, 0.2);
+        margin: 20px auto;
+        padding: 20px;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 600px;
+        font-size: 1.2em;
+        color: white;
+        overflow-wrap: break-word;
+    }
+    .notif {
+        position: fixed;
+        top: 20px;
+        right: -300px;
+        background: #2ecc71;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 50px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        font-size: 0.8em;
+        animation: none;
+        z-index: 1000;
+    }
+    @keyframes notifSlide {
+        0% { right: -300px; opacity: 0; }
+        20% { right: 30px; opacity: 1; }
+        80% { right: 30px; opacity: 1; }
+        100% { right: -300px; opacity: 0; }
+    }
+</style>
+</head>
+<body>
+
+<h1>List Creator Graffiti</h1>
+
+<div id="papan-container"></div>
+
+<div class="btns">
+    <button onclick="tambahPapan()">Tambah Papan</button>
+    <button onclick="buatOutput()">Buat Output</button>
+    <button onclick="salinOutput()">Salin Output</button>
+    <button onclick="salinLink()">Salin Link</button>
+</div>
+
+<div id="output"></div>
+
+<div class="notif" id="notif">Berhasil!</div>
+
+<script>
+const simbolList = ["✪","☆","✦","✧","✩","✰","⚝","❂","☀","☼","⚡","☄","❉","❥","✿","❀","❁","☘","☾","☽","✈","☯","♛","♚"];
+const fontList = [
+    'Baloo 2', 'Orbitron', 'Rubik Mono One', 'Permanent Marker',
+    'Bangers', 'Rock Salt', 'Press Start 2P', 'Fredericka the Great'
+];
+
+function tambahPapan(data = {simbol: "", teks: "", font: "Baloo 2"}) {
+    const papan = document.createElement("div");
+    papan.className = "papan";
+    papan.innerHTML = `
+        <select class="simbol">
+            ${simbolList.map(s => `<option ${s === data.simbol ? "selected" : ""}>${s}</option>`).join("")}
+        </select>
+        <input class="teks" type="text" placeholder="Tulis teks..." value="${data.teks}">
+        <select class="font">
+            ${fontList.map(f => `<option value="${f}" ${f === data.font ? "selected" : ""}>${f}</option>`).join("")}
+        </select>
+    `;
+    document.getElementById("papan-container").appendChild(papan);
+    if (!data.fromLoad) showNotif('Papan Ditambahkan!');
+}
+
+function buatOutput() {
+    const output = document.getElementById("output");
+    output.innerHTML = "";
+    const papans = document.querySelectorAll(".papan");
+    papans.forEach(papan => {
+        const simbol = papan.querySelector(".simbol").value;
+        const teks = papan.querySelector(".teks").value;
+        const font = papan.querySelector(".font").value;
+        if (simbol && (teks.trim() || true)) {
+            const item = document.createElement("div");
+            item.style.fontFamily = font;
+            item.innerText = `${simbol} ${teks}`;
+            output.appendChild(item);
+        }
+    });
+    showNotif('Output Dibuat!');
+}
+
+function salinOutput() {
+    const outputText = document.getElementById("output").innerText;
+    navigator.clipboard.writeText(outputText);
+    showNotif('Output Disalin!');
+}
+
+function salinLink() {
+    const papans = Array.from(document.querySelectorAll(".papan")).map(papan => ({
+        simbol: papan.querySelector(".simbol").value,
+        teks: papan.querySelector(".teks").value,
+        font: papan.querySelector(".font").value
+    }));
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(papans))));
+    const url = `${location.origin}${location.pathname}?data=${encoded}`;
+    navigator.clipboard.writeText(url);
+    showNotif('Link Disalin!');
+}
+
+function showNotif(text) {
+    const notif = document.getElementById("notif");
+    notif.innerText = text;
+    notif.style.animation = "none";
+    notif.offsetHeight; // trigger reflow
+    notif.style.animation = "notifSlide 3s ease forwards";
+}
+
+function loadFromURL() {
+    const params = new URLSearchParams(location.search);
+    if (params.has("data")) {
+        try {
+            const data = JSON.parse(decodeURIComponent(escape(atob(params.get("data")))));
+            data.forEach(d => tambahPapan({...d, fromLoad: true}));
+        } catch(e) {
+            tambahPapan();
+        }
+    } else {
+        tambahPapan();
+    }
+}
+
+loadFromURL();
+</script>
+
+</body>
+</html>
